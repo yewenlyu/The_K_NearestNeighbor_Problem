@@ -19,6 +19,7 @@ import java.util.Set;
 public class kNearestNeighbor {
 
 	static final int DIMENSION = 784;
+	static List<FeatureVector> trainingData;
 
 	/**
 	 * The classifier of KNN with prediction rule trained on training data set.
@@ -27,7 +28,7 @@ public class kNearestNeighbor {
 	 * @param x - unseen input data point from training/validation/test data set
 	 * @return - predicted label for x from the trained classifier
 	 */
-	private static int kNNClassifier(int k, FeatureVector x, List<FeatureVector> trainingDataSet) {
+	private static int kNNClassifier(int k, FeatureVector x) {
 
 		// this is the approach of finding smallest k elements using a max heap
 		PriorityQueue<FeatureVector> knnMaxHeap = new PriorityQueue<>(k, new Comparator<FeatureVector>() {
@@ -35,11 +36,10 @@ public class kNearestNeighbor {
 				return (dist(v1, x) > dist(v2, x)) ? -1 : 1;
 			}
 		});
-		
+
 		// find the k nearest neighbors in the training data with respect to x
 		int i = 0;
-		for (FeatureVector trainingDataPt : trainingDataSet)
-		{
+		for (FeatureVector trainingDataPt : trainingData) {
 			if (i < k) {
 				knnMaxHeap.offer(trainingDataPt);
 				i++;
@@ -51,25 +51,25 @@ public class kNearestNeighbor {
 				}
 			}
 		}
-		
+
 		// retrieve the labels of the k nearest neighbors and compute their mode
-		List<Integer> labels = new ArrayList<>(); 
+		List<Integer> labels = new ArrayList<>();
 		for (FeatureVector vector : knnMaxHeap) {
 			labels.add(vector.getLabel());
 		}
-		
+
 		return modeOf(labels);
 	}
-	
+
 	/**
-	 * Return the mode of input integer array, ties resolved
-	 * in random
+	 * Return the mode of input integer array, ties resolved in random
+	 * 
 	 * @param data
 	 * @return
 	 */
 	private static int modeOf(List<Integer> data) {
-		
-		// compute the frequencies of each element 
+
+		// compute the frequencies of each element
 		Map<Integer, Integer> dataMap = new HashMap<>();
 		for (Integer elem : data) {
 			if (dataMap.containsKey(elem)) {
@@ -79,7 +79,7 @@ public class kNearestNeighbor {
 			}
 		}
 		Set<Map.Entry<Integer, Integer>> dataSet = dataMap.entrySet();
-		
+
 		// find the maximum frequency
 		int maximum = Integer.MIN_VALUE;
 		for (Map.Entry<Integer, Integer> entry : dataSet) {
@@ -87,7 +87,7 @@ public class kNearestNeighbor {
 				maximum = entry.getValue();
 			}
 		}
-		
+
 		// filter labels with maximum frequency
 		List<Integer> modes = new ArrayList<>();
 		for (Map.Entry<Integer, Integer> entry : dataSet) {
@@ -95,7 +95,7 @@ public class kNearestNeighbor {
 				modes.add(entry.getKey());
 			}
 		}
-		
+
 		// resolve ties by randomly choosing a mode
 		Random rand = new Random(System.currentTimeMillis());
 		return modes.get(rand.nextInt(modes.size()));
@@ -120,8 +120,8 @@ public class kNearestNeighbor {
 	/**
 	 * This function parses the input data set file into a List of FeatureVectors.
 	 * 
-	 * @param dataFile     -
-	 * @param emptyDataSet - container list
+	 * @param dataFile
+	 * @param emptyDataSet - container list for data
 	 * @throws FileNotFoundException
 	 */
 	private static void parseDataFile(File dataFile, List<FeatureVector> emptyDataSet) throws FileNotFoundException {
@@ -139,7 +139,33 @@ public class kNearestNeighbor {
 	}
 
 	/**
-	 * Train the Classifier, calculate Validation/Training/Test Error against the
+	 * Compute the training/validation/test data against the trained classifier,
+	 * then return the corresponding error
+	 * 
+	 * @param k            - parameter for the K-Nearest Neighbor Problem
+	 * @param inputDataSet
+	 * @return training/validation/test error
+	 */
+	private static double kNNcompute(int k, List<FeatureVector> inputDataSet) {
+		int dataSetSize = inputDataSet.size();
+		int processedData = 0;
+		int errors = 0;
+
+		for (FeatureVector dataPt : inputDataSet) {
+			int outputLable = kNNClassifier(k, dataPt);
+			processedData++;
+			if (outputLable != dataPt.getLabel()) {
+				errors++;
+			}
+			// printProgress(errors, processedData, dataSetSize);
+		}
+		System.out.print(processedData + " data points processed, " + errors + " prediction error reported.");
+
+		return (double) errors / (double) dataSetSize;
+	}
+
+	/**
+	 * Train the Classifier, compute Validation/Training/Test Error against the
 	 * prediction rule.
 	 * 
 	 * @param args
@@ -158,6 +184,7 @@ public class kNearestNeighbor {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+		trainingData = trainingDataSet;
 
 		// parse validation data set
 		List<FeatureVector> validationDataSet = new LinkedList<>();
@@ -175,5 +202,38 @@ public class kNearestNeighbor {
 			e.printStackTrace();
 		}
 
+		// test K-NN Classifier with k = 1, 5, 9 and 15.
+		int[] params = new int[] { 1, 3, 5, 9, 15 };
+		for (int i = 0; i < params.length; i++) {
+			int k = params[i];
+
+			System.out.println("\n>> K-NN Classifier with k = " + k);
+
+			long clockStart = System.currentTimeMillis();
+			System.out.println("\nComputing K-NN against Training data ...");
+			double trainingError = kNNcompute(k, trainingDataSet);
+			System.out.println("\nTraining Error (k = " + k + ") = " + trainingError);
+			long clockStop = System.currentTimeMillis();
+			double durationInSec = (double) (clockStop - clockStart) / 1000;
+			System.out.println("Time Elapsed: " + durationInSec + "s");
+
+			clockStart = System.currentTimeMillis();
+			System.out.println("\nComputing K-NN against Validation data ...");
+			double validationError = kNNcompute(k, validationDataSet);
+			System.out.println("\nValidation Error (k = " + k + ") = " + validationError);
+			clockStop = System.currentTimeMillis();
+			durationInSec = (double) (clockStop - clockStart) / 1000;
+			System.out.println("Time Elapsed: " + durationInSec + "s");
+
+			clockStart = System.currentTimeMillis();
+			System.out.println("\nComputing K-NN against Test data ...");
+			double testError = kNNcompute(k, testDataSet);
+			System.out.println("\nTest Error (k = " + k + ") = " + testError);
+			clockStop = System.currentTimeMillis();
+			durationInSec = (double) (clockStop - clockStart) / 1000;
+			System.out.println("Time Elapsed: " + durationInSec + "s");
+		}
+
+		System.out.println("\nComputation completed.");
 	}
 }
