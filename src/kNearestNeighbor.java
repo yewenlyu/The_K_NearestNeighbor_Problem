@@ -18,8 +18,9 @@ import java.util.Set;
  */
 public class kNearestNeighbor {
 
-	static final int DIMENSION = 784;
-	static List<FeatureVector> trainingData;
+	private static List<FeatureVector> trainingData;
+	private static double[][] pMatrix; // dimension 784x20, orthonormal columns
+	private static int dimension; // dimension of the feature vectors
 
 	/**
 	 * The classifier of KNN with prediction rule trained on training data set.
@@ -108,10 +109,14 @@ public class kNearestNeighbor {
 	 * @param x2
 	 * @return $dist(x1, x2) = \sum_{i=0}^DIMENSION (x1_i, x2_i)^2$
 	 */
-	private static int dist(FeatureVector x1, FeatureVector x2) {
-		int sumOfSquareDiff = 0;
-		for (int i = 0; i < DIMENSION; i++) {
-			int diff = x1.getCoordinate()[i] - x2.getCoordinate()[i];
+	private static double dist(FeatureVector x1, FeatureVector x2) {
+		if (x1.getCoordinate().length != dimension || x2.getCoordinate().length != dimension) {
+			System.out.println("Error: opperand have different or invalid dimensions.");
+		}
+
+		double sumOfSquareDiff = 0;
+		for (int i = 0; i < dimension; i++) {
+			double diff = x1.getCoordinate()[i] - x2.getCoordinate()[i];
 			sumOfSquareDiff += diff * diff;
 		}
 		return sumOfSquareDiff;
@@ -139,6 +144,27 @@ public class kNearestNeighbor {
 	}
 
 	/**
+	 * This function parses the input text file to a 784x20 matrix
+	 * 
+	 * @param matrixFile
+	 */
+	private static void parseMatrix(File matrixFile) throws FileNotFoundException {
+		System.out.println("\nParsing input orthonomal vectors\n");
+
+		pMatrix = new double[784][20];
+		Scanner fScanner = new Scanner(matrixFile);
+
+		// to store the transpose fill the matrix in vertically
+		for (int i = 0; i < 784; i++) {
+			String[] pMatrixRow = fScanner.nextLine().split(" ");
+			for (int j = 0; j < 20; j++) {
+				pMatrix[i][j] = Double.parseDouble(pMatrixRow[j]);
+			}
+		}
+		fScanner.close();
+	}
+
+	/**
 	 * Compute the training/validation/test data against the trained classifier,
 	 * then return the corresponding error
 	 * 
@@ -157,7 +183,6 @@ public class kNearestNeighbor {
 			if (outputLable != dataPt.getLabel()) {
 				errors++;
 			}
-			// printProgress(errors, processedData, dataSetSize);
 		}
 		System.out.print(processedData + " data points processed, " + errors + " prediction error reported.");
 
@@ -165,8 +190,11 @@ public class kNearestNeighbor {
 	}
 
 	/**
-	 * Train the Classifier, compute Validation/Training/Test Error against the
-	 * prediction rule.
+	 * This program runs in two steps, first train the Classifier using the original
+	 * training data, compute the Training/Validation/Test Error against the
+	 * prediction rule. Then project the Training/Validation/Test data points on to
+	 * the column space of a matrix with orthogonal unit columns, and recompute the
+	 * Validation/Training/Test Error
 	 * 
 	 * @param args
 	 */
@@ -202,38 +230,88 @@ public class kNearestNeighbor {
 			e.printStackTrace();
 		}
 
-		// test K-NN Classifier with k = 1, 5, 9 and 15.
-		int[] params = new int[] { 1, 3, 5, 9, 15 };
-		for (int i = 0; i < params.length; i++) {
-			int k = params[i];
+		// time measurements
+		long clockStart;
+		long clockStop;
+		double durationInSec;
 
-			System.out.println("\n>> K-NN Classifier with k = " + k);
+		// dimension for step one
+		dimension = 784;
 
-			long clockStart = System.currentTimeMillis();
-			System.out.println("\nComputing K-NN against Training data ...");
-			double trainingError = kNNcompute(k, trainingDataSet);
-			System.out.println("\nTraining Error (k = " + k + ") = " + trainingError);
-			long clockStop = System.currentTimeMillis();
-			double durationInSec = (double) (clockStop - clockStart) / 1000;
-			System.out.println("Time Elapsed: " + durationInSec + "s");
+		for (int step = 1; step <= 2; step++) {
+			// step two of the program pre-processes the training/validation/test data
+			if (step == 2) {
+				System.out.println("\nStep " + step + " completed.");
+				
+				try {
+					parseMatrix(new File("projection.txt"));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
 
-			clockStart = System.currentTimeMillis();
-			System.out.println("\nComputing K-NN against Validation data ...");
-			double validationError = kNNcompute(k, validationDataSet);
-			System.out.println("\nValidation Error (k = " + k + ") = " + validationError);
-			clockStop = System.currentTimeMillis();
-			durationInSec = (double) (clockStop - clockStart) / 1000;
-			System.out.println("Time Elapsed: " + durationInSec + "s");
+				// project the training/validation/test data sets onto the input vector space
+				clockStart = System.currentTimeMillis();
+				System.out.println("Projecting training data...");
+				for (FeatureVector trainDataPt : trainingDataSet) {
+					trainDataPt.project(pMatrix);
+				}
+				clockStop = System.currentTimeMillis();
+				durationInSec = (double) (clockStop - clockStart) / 1000;
+				System.out.println("Time Elapsed: " + durationInSec + "s");
 
-			clockStart = System.currentTimeMillis();
-			System.out.println("\nComputing K-NN against Test data ...");
-			double testError = kNNcompute(k, testDataSet);
-			System.out.println("\nTest Error (k = " + k + ") = " + testError);
-			clockStop = System.currentTimeMillis();
-			durationInSec = (double) (clockStop - clockStart) / 1000;
-			System.out.println("Time Elapsed: " + durationInSec + "s");
+				clockStart = System.currentTimeMillis();
+				System.out.println("Projecting validation data...");
+				for (FeatureVector validationDataPt : validationDataSet) {
+					validationDataPt.project(pMatrix);
+				}
+				clockStop = System.currentTimeMillis();
+				durationInSec = (double) (clockStop - clockStart) / 1000;
+				System.out.println("Time Elapsed: " + durationInSec + "s");
+
+				clockStart = System.currentTimeMillis();
+				System.out.println("Projecting test data...");
+				for (FeatureVector testDataPt : testDataSet) {
+					testDataPt.project(pMatrix);
+				}
+				clockStop = System.currentTimeMillis();
+				durationInSec = (double) (clockStop - clockStart) / 1000;
+				System.out.println("Time Elapsed: " + durationInSec + "s");
+
+				// after projection all feature vectors have dimension 20
+				dimension = 20;
+			}
+
+			// test K-NN Classifier with k = 1, 5, 9 and 15.
+			int[] params = new int[] { 1, 3, 5, 9, 15 };
+			for (int i = 0; i < params.length; i++) {
+				int k = params[i];
+
+				System.out.println("\n>> K-NN Classifier with k = " + k);
+
+				clockStart = System.currentTimeMillis();
+				System.out.println("\nComputing K-NN against Training data ...");
+				double trainingError = kNNcompute(k, trainingDataSet);
+				System.out.println("\nTraining Error (k = " + k + ") = " + trainingError);
+				clockStop = System.currentTimeMillis();
+				durationInSec = (double) (clockStop - clockStart) / 1000;
+				System.out.println("Time Elapsed: " + durationInSec + "s");
+
+				clockStart = System.currentTimeMillis();
+				System.out.println("\nComputing K-NN against Validation data ...");
+				double validationError = kNNcompute(k, validationDataSet);
+				System.out.println("\nValidation Error (k = " + k + ") = " + validationError);
+				clockStop = System.currentTimeMillis();
+				durationInSec = (double) (clockStop - clockStart) / 1000;
+				System.out.println("Time Elapsed: " + durationInSec + "s");
+
+				clockStart = System.currentTimeMillis();
+				System.out.println("\nComputing K-NN against Test data ...");
+				double testError = kNNcompute(k, testDataSet);
+				System.out.println("\nTest Error (k = " + k + ") = " + testError);
+				clockStop = System.currentTimeMillis();
+				durationInSec = (double) (clockStop - clockStart) / 1000;
+				System.out.println("Time Elapsed: " + durationInSec + "s");
+			}
 		}
-
-		System.out.println("\nComputation completed.");
 	}
 }
