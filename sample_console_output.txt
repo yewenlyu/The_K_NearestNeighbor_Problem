@@ -1,0 +1,186 @@
+Parsing "pa1train.txt", 2000 entries read.
+Parsing "pa1validate.txt", 1000 entries read.
+Parsing "pa1test.txt", 1000 entries read.
+
+>> K-NN Classifier with k = 1
+
+Computing K-NN against Training data ...
+2000 data points processed, 0 prediction error reported.
+Training Error (k = 1) = 0.0
+Time Elapsed: 6.5s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 82 prediction error reported.
+Validation Error (k = 1) = 0.082
+Time Elapsed: 3.236s
+
+Computing K-NN against Test data ...
+1000 data points processed, 94 prediction error reported.
+Test Error (k = 1) = 0.094
+Time Elapsed: 3.218s
+
+>> K-NN Classifier with k = 3
+
+Computing K-NN against Training data ...
+2000 data points processed, 84 prediction error reported.
+Training Error (k = 3) = 0.042
+Time Elapsed: 6.609s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 102 prediction error reported.
+Validation Error (k = 3) = 0.102
+Time Elapsed: 3.32s
+
+Computing K-NN against Test data ...
+1000 data points processed, 88 prediction error reported.
+Test Error (k = 3) = 0.088
+Time Elapsed: 3.295s
+
+>> K-NN Classifier with k = 5
+
+Computing K-NN against Training data ...
+2000 data points processed, 109 prediction error reported.
+Training Error (k = 5) = 0.0545
+Time Elapsed: 6.986s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 94 prediction error reported.
+Validation Error (k = 5) = 0.094
+Time Elapsed: 3.509s
+
+Computing K-NN against Test data ...
+1000 data points processed, 101 prediction error reported.
+Test Error (k = 5) = 0.101
+Time Elapsed: 3.489s
+
+>> K-NN Classifier with k = 9
+
+Computing K-NN against Training data ...
+2000 data points processed, 141 prediction error reported.
+Training Error (k = 9) = 0.0705
+Time Elapsed: 7.763s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 101 prediction error reported.
+Validation Error (k = 9) = 0.101
+Time Elapsed: 3.873s
+
+Computing K-NN against Test data ...
+1000 data points processed, 106 prediction error reported.
+Test Error (k = 9) = 0.106
+Time Elapsed: 3.882s
+
+>> K-NN Classifier with k = 15
+
+Computing K-NN against Training data ...
+2000 data points processed, 185 prediction error reported.
+Training Error (k = 15) = 0.0925
+Time Elapsed: 8.595s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 108 prediction error reported.
+Validation Error (k = 15) = 0.108
+Time Elapsed: 4.321s
+
+Computing K-NN against Test data ...
+1000 data points processed, 117 prediction error reported.
+Test Error (k = 15) = 0.117
+Time Elapsed: 4.396s
+
+Step 1 completed.
+
+Parsing input orthonomal vectors
+
+Projecting training data...
+Time Elapsed: 0.062s
+Projecting validation data...
+Time Elapsed: 0.031s
+Projecting test data...
+Time Elapsed: 0.032s
+
+>> K-NN Classifier with k = 1
+
+Computing K-NN against Training data ...
+2000 data points processed, 0 prediction error reported.
+Training Error (k = 1) = 0.0
+Time Elapsed: 0.203s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 320 prediction error reported.
+Validation Error (k = 1) = 0.32
+Time Elapsed: 0.094s
+
+Computing K-NN against Test data ...
+1000 data points processed, 314 prediction error reported.
+Test Error (k = 1) = 0.314
+Time Elapsed: 0.093s
+
+>> K-NN Classifier with k = 3
+
+Computing K-NN against Training data ...
+2000 data points processed, 314 prediction error reported.
+Training Error (k = 3) = 0.157
+Time Elapsed: 0.219s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 327 prediction error reported.
+Validation Error (k = 3) = 0.327
+Time Elapsed: 0.094s
+
+Computing K-NN against Test data ...
+1000 data points processed, 304 prediction error reported.
+Test Error (k = 3) = 0.304
+Time Elapsed: 0.078s
+
+>> K-NN Classifier with k = 5
+
+Computing K-NN against Training data ...
+2000 data points processed, 385 prediction error reported.
+Training Error (k = 5) = 0.1925
+Time Elapsed: 0.187s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 299 prediction error reported.
+Validation Error (k = 5) = 0.299
+Time Elapsed: 0.1s
+
+Computing K-NN against Test data ...
+1000 data points processed, 299 prediction error reported.
+Test Error (k = 5) = 0.299
+Time Elapsed: 0.097s
+
+>> K-NN Classifier with k = 9
+
+Computing K-NN against Training data ...
+2000 data points processed, 461 prediction error reported.
+Training Error (k = 9) = 0.2305
+Time Elapsed: 0.187s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 300 prediction error reported.
+Validation Error (k = 9) = 0.3
+Time Elapsed: 0.078s
+
+Computing K-NN against Test data ...
+1000 data points processed, 292 prediction error reported.
+Test Error (k = 9) = 0.292
+Time Elapsed: 0.11s
+
+>> K-NN Classifier with k = 15
+
+Computing K-NN against Training data ...
+2000 data points processed, 518 prediction error reported.
+Training Error (k = 15) = 0.259
+Time Elapsed: 0.265s
+
+Computing K-NN against Validation data ...
+1000 data points processed, 288 prediction error reported.
+Validation Error (k = 15) = 0.288
+Time Elapsed: 0.094s
+
+Computing K-NN against Test data ...
+1000 data points processed, 295 prediction error reported.
+Test Error (k = 15) = 0.295
+Time Elapsed: 0.109s
+
+Step 2 completed.

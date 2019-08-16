@@ -149,7 +149,7 @@ public class kNearestNeighbor {
 	 * @param matrixFile
 	 */
 	private static void parseMatrix(File matrixFile) throws FileNotFoundException {
-		System.out.println("\nParsing input orthonomal vectors\n");
+		System.out.println("\nParsing input orthonormal vectors\n");
 
 		pMatrix = new double[784][20];
 		Scanner fScanner = new Scanner(matrixFile);
@@ -241,7 +241,6 @@ public class kNearestNeighbor {
 		for (int step = 1; step <= 2; step++) {
 			// step two of the program pre-processes the training/validation/test data
 			if (step == 2) {
-				System.out.println("\nStep " + step + " completed.");
 				
 				try {
 					parseMatrix(new File("projection.txt"));
@@ -312,6 +311,8 @@ public class kNearestNeighbor {
 				durationInSec = (double) (clockStop - clockStart) / 1000;
 				System.out.println("Time Elapsed: " + durationInSec + "s");
 			}
+			
+			System.out.println("\nStep " + step + " completed.");
 		}
 	}
 }
